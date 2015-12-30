@@ -13,3 +13,7 @@ cargo build
 ```bash
 monster-hunter decode save <path to save file>
 ```
+
+## Example
+
+Right now I just write a text representation of the underlying data out to stdout. Here is a link to some example output. https://gist.github.com/aconbere/57cb47491804d9799c8b
