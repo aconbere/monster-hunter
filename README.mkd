@@ -1,0 +1,15 @@
+# Monster Hunter Binary Decoder
+
+In progress work to decode monster hunter binary files and output them as something more useful. Right now it's less useful, but give me a second.
+
+## Building
+
+```bash
+cargo build
+```
+
+## Running
+
+```bash
+monster-hunter decode save <path to save file>
+```
