@@ -29,6 +29,6 @@ pub struct Armor {
     //             0x40=custom
     //             0x80=rainbow
     color_mode:            u8,
-    unknown_2:             [u8; 8]
+    unknown_2:             u64,
 }
 

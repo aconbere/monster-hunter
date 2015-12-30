@@ -38,4 +38,3 @@ pub struct Weapon {
     kinsect_ice_growth:      u8,
     kinsect_dragon_growth:   u8,
 }
-

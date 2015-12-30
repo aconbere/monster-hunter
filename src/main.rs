@@ -14,11 +14,12 @@ fn decode(source: &str) {
 	// aborts on failure
     let mut f = File::open(source).unwrap();
     let character: Character = unsafe { mem::uninitialized() };
-    let mut buffer: [u8; 75266] = unsafe { mem::transmute(character) };
+    // let mut buffer: [u8; 75266] = unsafe { mem::transmute(character) };
+    let mut buffer: [u8; 75264] = unsafe { mem::transmute(character) };
     
     // TODO: Use read_exact, coming in Rust 1.6
     match f.read(&mut buffer) {
-        Ok(75266) => {
+        Ok(75264) => {
             let result: Character = unsafe {
                 mem::transmute(buffer)
             };
