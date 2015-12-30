@@ -39,11 +39,9 @@ Options:
 ";
 
 fn main() {
-	// Parse argv and exit the program with an error message if it fails.
 	let args = Docopt::new(USAGE)
 					  .and_then(|d| d.parse())
 					  .unwrap_or_else(|e| e.exit());
-    // decode(source)
 	
 	let source = args.get_str("<file>");
 	decode(source);
