@@ -1,9 +1,8 @@
 use std::fmt;
-use std::str;
 
 #[repr(C, packed)]
 pub struct Palico {
-    pub name: [u8; 24],
+    pub name: [u16; 12],
     pub id: u64,
     pub coat_color: u32,
     pub clothing_color: u32,
@@ -60,8 +59,8 @@ pub struct Palico {
 }
 
 impl Palico {
-    fn name(&self) -> &str {
-        str::from_utf8(&self.name).unwrap()
+    fn name(&self) -> String {
+        String::from_utf16(&self.name).unwrap()
     }
 }
 

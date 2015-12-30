@@ -1,5 +1,4 @@
 use std::fmt;
-use std::str;
 
 use objects::weapon::Weapon;
 use objects::armor::Armor;
@@ -51,7 +50,7 @@ pub struct EquipmentBoxIndexes {
 
 #[repr(C, packed)]
 pub struct CharacterFeatures {
-    pub name:           [u8; 24],
+    pub name:           [u16; 12],
     pub gender:         u8,
     pub face:           u8,
     pub hair_style:     u8,
@@ -160,8 +159,8 @@ pub struct Character {
 }
 
 impl CharacterFeatures {
-    fn name(&self) -> &str {
-        str::from_utf8(&self.name).unwrap()
+    fn name(&self) -> String {
+        String::from_utf16(&self.name).unwrap()
     }
 }
 
