@@ -1,0 +1,8 @@
+[package]
+
+name = "monster_hunter"
+version = "0.0.1"
+authors = [ "Anders Conbere <anders@conbere.org>" ]
+
+[dependencies]
+docopt = "0.6"

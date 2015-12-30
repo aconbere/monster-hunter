@@ -1,0 +1,11 @@
+pub mod character;
+pub mod weapon;
+pub mod armor;
+pub mod talismen;
+pub mod color;
+pub mod guild_quest;
+pub mod item;
+pub mod palico_equipment;
+pub mod equipment;
+pub mod expedition;
+pub mod palico;

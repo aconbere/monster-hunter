@@ -1,0 +1,4 @@
+*.swp
+*.envrc
+.DS_Store
+target
