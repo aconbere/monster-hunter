@@ -97,17 +97,23 @@ impl fmt::Debug for CharacterFeatures {
     }
 }
 
+#[derive(Debug)]
+#[repr(C, packed)]
+pub struct GameData {
+    pub hunter_rank:       u32,
+    pub total_hr_points:   u32,
+    pub funds:             u32,
+    pub play_time_mh4g:    u32,
+    pub play_time_mh4:     u32,
+}
+
 #[repr(C, packed)]
 pub struct Character {
     pub features:          CharacterFeatures,
 
     pub unknown_1:         u8,
 
-    pub hunter_rank:       u32,
-    pub total_hr_points:   u32,
-    pub funds:             u32,
-    pub play_time_mh4g:    u32,
-    pub play_time_mh4:     u32,
+    pub game_data:         GameData,
 
     pub equipped_weapon:   Weapon,
     pub equipped_armor:    EquippedArmor,
@@ -168,11 +174,7 @@ impl fmt::Debug for Character {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f,  r#"Character: (
             features: {:#?},
-            hunter_rank: {},
-            total_hr_points: {},
-            funds: {},
-            play_time_mh4g: {},
-            play_time_mh4: {},
+            game_data: {:#?},
             equipped_weapon: {:#?},
             equipped_armor: {:#?},
             equipped_talismen: {:#?},
@@ -182,11 +184,7 @@ impl fmt::Debug for Character {
             palico: {:#?},
         )"#,
             self.features,
-            self.hunter_rank,
-            self.total_hr_points,
-            self.funds,
-            self.play_time_mh4g,
-            self.play_time_mh4,
+            self.game_data,
             self.equipped_weapon,
             self.equipped_armor,
             self.equipped_talismen,
