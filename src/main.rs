@@ -5,6 +5,7 @@ extern crate docopt;
 use std::mem;
 use std::fs::File;
 use std::io::Read;
+use std::path::Path;
 
 use docopt::Docopt;
 
@@ -15,7 +16,7 @@ mod targets;
 use targets::sqlite;
 
 
-fn decode(source: &str) {
+fn decode(source: &str, destination: &Path) {
 	// aborts on failure
     let mut f = File::open(source).unwrap();
     let character: Character = unsafe { mem::uninitialized() };
@@ -28,14 +29,15 @@ fn decode(source: &str) {
             let result: Character = unsafe {
                 mem::transmute(buffer)
             };
-            println!("result: {:?}", result);
+            // println!("result: {:?}", result);
+            sqlite::export(&result, &destination);
         }
         _ => panic!("read failed")
     }
 }
 
 const USAGE: &'static str = "
-Usage: mh decode save <file>
+Usage: mh decode save <file> <destination>
 	   mh -h | --help
 	   mh --version
 
@@ -50,5 +52,6 @@ fn main() {
 					  .unwrap_or_else(|e| e.exit());
 	
 	let source = args.get_str("<file>");
-	decode(source);
+	let destination = Path::new(args.get_str("<destination>"));
+	decode(source, destination);
 }
