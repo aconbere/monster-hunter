@@ -12,7 +12,7 @@ enum EquipmentClass {
     Empty
 }
 
-enum DecodedEquipmentClass {
+pub enum DecodedEquipmentClass {
     Weapon(Weapon),
     Armor(Armor),
     Talismen(Talismen),
@@ -36,7 +36,7 @@ impl Equipment {
     }
 
 
-    fn decode(&self) -> DecodedEquipmentClass {
+    pub fn decode(&self) -> DecodedEquipmentClass {
         match self.equipment_class(){
             EquipmentClass::Armor => {
                 let result: Armor = unsafe {
