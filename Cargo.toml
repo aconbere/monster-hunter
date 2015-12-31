@@ -8,3 +8,5 @@ authors = [ "Anders Conbere <anders@conbere.org>" ]
 docopt = "0.6"
 rawsql = "0.1.0"
 rusqlite = "0.6.0"
+flate2 = "0.2"
+rustc-serialize = "0.3"

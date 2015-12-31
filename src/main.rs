@@ -1,43 +1,18 @@
 extern crate rusqlite;
 extern crate rawsql;
 extern crate docopt;
-
-use std::mem;
-use std::fs::File;
-use std::io::Read;
-use std::path::Path;
+extern crate rustc_serialize;
 
 use docopt::Docopt;
 
 mod objects;
-use objects::character::Character;
-
 mod targets;
-use targets::sqlite;
-
-
-fn decode(source: &str, destination: &Path) {
-	// aborts on failure
-    let mut f = File::open(source).unwrap();
-    let character: Character = unsafe { mem::uninitialized() };
-    // let mut buffer: [u8; 75266] = unsafe { mem::transmute(character) };
-    let mut buffer: [u8; 75264] = unsafe { mem::transmute(character) };
-    
-    // TODO: Use read_exact, coming in Rust 1.6
-    match f.read(&mut buffer) {
-        Ok(75264) => {
-            let result: Character = unsafe {
-                mem::transmute(buffer)
-            };
-            // println!("result: {:?}", result);
-            sqlite::export(&result, &destination);
-        }
-        _ => panic!("read failed")
-    }
-}
+mod save;
+mod archive;
 
 const USAGE: &'static str = "
-Usage: mh decode save <file> <destination>
+Usage: mh save decode <source> <destination>
+       mh archive decode <source> <destination>
 	   mh -h | --help
 	   mh --version
 
@@ -46,12 +21,30 @@ Options:
     --version  Show the version of mh.
 ";
 
+#[derive(Debug, RustcDecodable)]
+struct Args {
+    arg_source:      String,
+    arg_destination: String,
+    cmd_save:        bool,
+    cmd_archive:     bool,
+    cmd_decode:      bool,
+}
+
 fn main() {
-	let args = Docopt::new(USAGE)
-					  .and_then(|d| d.parse())
-					  .unwrap_or_else(|e| e.exit());
+    let args: Args = Docopt::new(USAGE)
+                        .and_then(|d| d.decode())
+                        .unwrap_or_else(|e| e.exit());
 	
-	let source = args.get_str("<file>");
-	let destination = Path::new(args.get_str("<destination>"));
-	decode(source, destination);
+	if args.cmd_save {
+	    if args.cmd_decode {
+            save::decode(&args.arg_source, &args.arg_destination);
+        }
+    }
+
+    if args.cmd_archive {
+	    if args.cmd_decode {
+            let entries = archive::decode(&args.arg_source, &args.arg_destination);
+            println!("entries: {:?}", entries);
+        }
+    }
 }
