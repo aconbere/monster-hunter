@@ -1,3 +1,5 @@
+extern crate rusqlite;
+extern crate rawsql;
 extern crate docopt;
 
 use std::mem;
@@ -8,6 +10,9 @@ use docopt::Docopt;
 
 mod objects;
 use objects::character::Character;
+
+mod targets;
+use targets::sqlite;
 
 
 fn decode(source: &str) {
