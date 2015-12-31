@@ -1,6 +1,6 @@
 # Monster Hunter Binary Decoder
 
-In progress work to decode monster hunter binary files and output them as something more useful. Right now it's less useful, but give me a second.
+In progress work to decode monster hunter binary files and output them as a sqlite database;
 
 ## Building
 
@@ -11,9 +11,5 @@ cargo build
 ## Running
 
 ```bash
-monster-hunter decode save <path to save file>
+monster-hunter decode save <path to save file> <path to output database>
 ```
-
-## Example
-
-Right now I just write a text representation of the underlying data out to stdout. Here is a link to some example output. https://gist.github.com/aconbere/57cb47491804d9799c8b
