@@ -2,6 +2,7 @@ extern crate rusqlite;
 extern crate rawsql;
 extern crate docopt;
 extern crate rustc_serialize;
+extern crate flate2;
 
 use docopt::Docopt;
 
