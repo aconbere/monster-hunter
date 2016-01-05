@@ -2,3 +2,5 @@
 *.envrc
 .DS_Store
 target
+out
+.cargo

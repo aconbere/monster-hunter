@@ -14,6 +14,7 @@ mod archive;
 const USAGE: &'static str = "
 Usage: mh save decode <source> <destination>
        mh archive decode <source> <destination>
+       mh archive decompress <source> <destination>
 	   mh -h | --help
 	   mh --version
 
@@ -29,6 +30,7 @@ struct Args {
     cmd_save:        bool,
     cmd_archive:     bool,
     cmd_decode:      bool,
+    cmd_decompress:  bool,
 }
 
 fn main() {
@@ -46,6 +48,8 @@ fn main() {
 	    if args.cmd_decode {
             let entries = archive::decode(&args.arg_source, &args.arg_destination);
             println!("entries: {:?}", entries);
+        } else if args.cmd_decompress {
+            archive::decompress(&args.arg_source, &args.arg_destination);
         }
     }
 }

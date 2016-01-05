@@ -103,20 +103,22 @@ fn read_entries(f: &mut File, header: &Header) -> Vec<Entry> {
 
 fn read_file_chunk(entry: &Entry, f: &mut File) -> Vec<u8> {
     println!("read_file_chunk: {}-{}", entry.file_offset as u64, entry.compressed_file_size);
-    let mut b:Vec<u8> = Vec::with_capacity(entry.compressed_file_size as usize);
-    f.seek(SeekFrom::Start(entry.file_offset as u64)).ok();
-    f.read(&mut b).ok();
+    let mut b:Vec<u8> = vec![0; entry.compressed_file_size as usize];
+    f.seek(SeekFrom::Start(entry.file_offset as u64)).unwrap();
+    f.read(&mut b).unwrap();
+    println!("buffer length: {}", b.len());
     b
 }
 
-fn decompress_file_chunk_flate2(entry: &Entry, bytes:&Vec<u8>) -> Vec<u8> {
+fn decompress_file_chunk(entry: &Entry, bytes:&Vec<u8>) -> Vec<u8> {
     println!("decompress_file_chunk: {}-{}", entry.file_name_unix(), entry.decompressed_file_size() as usize);
     let mut b:Vec<u8> = Vec::with_capacity(entry.decompressed_file_size() as usize);
-    let mut d = Decompress::new(false);
+    println!("incoming length: {}", bytes.len());
+    let mut d = Decompress::new(true);
     match d.decompress_vec(bytes, &mut b, Flush::Finish) {
         Ok(Status::Ok) =>        println!("decompressed successfully"),
         Ok(Status::BufError) =>  println!("decompress failed: BufError"),
-        Ok(Status::StreamEnd) => println!("decompress failed: StreamEnd"),
+        Ok(Status::StreamEnd) => println!("decompress finished"),
         Err(DataError(_)) =>     println!("decompress failed: DataError")
     };
     b
@@ -140,6 +142,9 @@ fn write_entry(entry: &Entry, chunk: &Vec<u8>) -> io::Result<()> {
 }
 
 pub fn decode(source:&String, _destination:&String) {
+}
+
+pub fn decompress(source:&String, _destination:&String) {
     println!("Decoding: {}", source);
     let mut f = File::open(source).unwrap();
     let header = read_header(&mut f).unwrap();
@@ -150,7 +155,7 @@ pub fn decode(source:&String, _destination:&String) {
         println!("Entry: {:?}", entry);
         let file_chunk = read_file_chunk(&entry, &mut f);
 
-        let decompressed_chunk = decompress_file_chunk_flate2(&entry, &file_chunk);
+        let decompressed_chunk = decompress_file_chunk(&entry, &file_chunk);
         write_entry(&entry, &decompressed_chunk).ok();
 
         // will write out the file in a way that can be decompressed,
