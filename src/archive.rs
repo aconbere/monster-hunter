@@ -35,11 +35,13 @@ impl fmt::Debug for Entry {
         file_name: {},
         file_type: {},
         file_offset: {},
+        compressed_file_size: {},
         decompressed_file_size: {}
         )"#,
         self.file_name(),
         self.file_type,
         self.file_offset,
+        self.compressed_file_size,
         self.decompressed_file_size())
     }
 }
