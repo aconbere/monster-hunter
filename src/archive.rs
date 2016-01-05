@@ -124,8 +124,8 @@ fn decompress_file_chunk(entry: &Entry, bytes:&Vec<u8>) -> Vec<u8> {
     b
 }
 
-fn write_entry(entry: &Entry, chunk: &Vec<u8>) -> io::Result<()> {
-    let out_file = format!("out/{}", entry.file_name_unix());
+fn write_entry(entry: &Entry, chunk: &Vec<u8>, destination: &String) -> io::Result<()> {
+    let out_file = format!("{}/{}", destination, entry.file_name_unix());
     println!("write_entry: out-name: {:?}", out_file);
 
     match File::create(out_file) {
@@ -141,10 +141,10 @@ fn write_entry(entry: &Entry, chunk: &Vec<u8>) -> io::Result<()> {
     Ok(())
 }
 
-pub fn decode(source:&String, _destination:&String) {
+pub fn decode(_source:&String, _destination:&String) {
 }
 
-pub fn decompress(source:&String, _destination:&String) {
+pub fn decompress(source:&String, destination:&String) {
     println!("Decoding: {}", source);
     let mut f = File::open(source).unwrap();
     let header = read_header(&mut f).unwrap();
@@ -154,12 +154,7 @@ pub fn decompress(source:&String, _destination:&String) {
     for entry in entries {
         println!("Entry: {:?}", entry);
         let file_chunk = read_file_chunk(&entry, &mut f);
-
         let decompressed_chunk = decompress_file_chunk(&entry, &file_chunk);
-        write_entry(&entry, &decompressed_chunk).ok();
-
-        // will write out the file in a way that can be decompressed,
-        // this proves that the decompression isn't working.
-        // write_entry(&entry, &file_chunk).ok();
+        write_entry(&entry, &decompressed_chunk, destination).ok();
     }
 }
