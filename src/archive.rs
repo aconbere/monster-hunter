@@ -1,4 +1,5 @@
 use std::mem;
+use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::io::Read;
@@ -9,6 +10,7 @@ use std::io;
 use flate2::{Decompress, Flush, Status, DataError};
 use encoding::{Encoding, DecoderTrap};
 use encoding::all::{UTF_16LE};
+use regex::Regex;
 
 use objects::archive::{ArchiveHeader, ArchiveEntry, MsgIndexEntry};
 
@@ -146,13 +148,34 @@ pub fn read_msg(f:&mut File, entry: &MsgIndexEntry) -> Result<String,u32> {
     }
 }
 
-pub fn decode(source:&String, _destination:&String) {
+pub fn decode(source:&String) {
     let mut f = File::open(source).unwrap();
 
     let index:Vec<MsgIndexEntry> = read_index(&mut f);
 
     for i in index {
         println!("{}", read_msg(&mut f, &i).unwrap());
+    }
+}
+
+
+pub fn decode_all(source:&String) {
+    let re = Regex::new(r"eng\.msg\.(.*)_eng").unwrap();
+
+    for entry in fs::read_dir(source).unwrap() {
+        let entry = entry.unwrap();
+        let file_name = entry.file_name();
+        let path = entry.path();
+        let path_str = path.to_str().unwrap();
+        let path_string = path_str.to_string();
+        let name = file_name.to_str().unwrap();
+        match re.captures(name) {
+            Some(cap) => {
+                println!("{}", cap.at(1).unwrap().replace(".", "_"));
+                decode(&path_string);
+            },
+            None => (),
+        }
     }
 }
 
