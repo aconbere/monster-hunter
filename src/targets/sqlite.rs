@@ -57,8 +57,8 @@ fn insert_character(conn: &Connection, character:&Character) {
             DecodedEquipmentClass::Weapon(weapon) => {
                 conn.execute(insert_weapon, &[
                     &1,
-                    &(weapon.equipment_type as i64),
                     &(weapon.weapon_id as i64),
+                    &(weapon.equipment_type as i64),
                     &(weapon.element_value as i64),
                     &(weapon.element_type as i64),
                     &(weapon.sharpness as i64),
