@@ -7,7 +7,10 @@ use std::io::Read;
 use std::io::Seek;
 use std::io::SeekFrom;
 use std::io;
+
 use flate2::{Decompress, Flush, Status, DataError};
+use encoding::{Encoding, DecoderTrap};
+use encoding::all::{UTF_16LE};
 
 // const DECOMPRESSED_FILE_SIZE_MASK: u32 = 0b1111_0000_0000_0000_0000_0000_0000_0000;
 
@@ -102,18 +105,14 @@ fn read_entries(f: &mut File, header: &Header) -> Vec<Entry> {
 }
 
 fn read_file_chunk(entry: &Entry, f: &mut File) -> Vec<u8> {
-    println!("read_file_chunk: {}-{}", entry.file_offset as u64, entry.compressed_file_size);
     let mut b:Vec<u8> = vec![0; entry.compressed_file_size as usize];
     f.seek(SeekFrom::Start(entry.file_offset as u64)).unwrap();
     f.read(&mut b).unwrap();
-    println!("buffer length: {}", b.len());
     b
 }
 
 fn decompress_file_chunk(entry: &Entry, bytes:&Vec<u8>) -> Vec<u8> {
-    println!("decompress_file_chunk: {}-{}", entry.file_name_unix(), entry.decompressed_file_size() as usize);
     let mut b:Vec<u8> = Vec::with_capacity(entry.decompressed_file_size() as usize);
-    println!("incoming length: {}", bytes.len());
     let mut d = Decompress::new(true);
     match d.decompress_vec(bytes, &mut b, Flush::Finish) {
         Ok(Status::Ok) =>        println!("decompressed successfully"),
@@ -126,33 +125,111 @@ fn decompress_file_chunk(entry: &Entry, bytes:&Vec<u8>) -> Vec<u8> {
 
 fn write_entry(entry: &Entry, chunk: &Vec<u8>, destination: &String) -> io::Result<()> {
     let out_file = format!("{}/{}", destination, entry.file_name_unix());
-    println!("write_entry: out-name: {:?}", out_file);
 
     match File::create(out_file) {
         Ok(mut f) => {
-            println!("write_bytes: file created!");
             try!(f.write_all(chunk));
         },
         Err(err) => {
-            println!("write_bytes: Error: {:?}", err);
             panic!(err)
         }
     }
     Ok(())
 }
 
-pub fn decode(_source:&String, _destination:&String) {
+#[derive(Debug)]
+#[repr(C, packed)]
+pub struct MsgIndexEntry {
+    pub offset:u32,
+    pub size:u32,
+    unknown_1:u32,
+}
+
+impl MsgIndexEntry {
+    fn size(&self) -> u32 {
+        self.size * 2
+    }
+}
+
+pub fn read_index_entry(f:&mut File) -> Result<MsgIndexEntry, u32> {
+    let mut b: [u8; 12] = [0; 12];
+
+    match f.read(&mut b) {
+        Ok(12) => {
+            let index:MsgIndexEntry = unsafe { mem::transmute(b) };
+            Ok(index)
+        },
+        Ok(_) => Err(1),
+        Err(_) => Err(2),
+    }
+}
+
+pub fn read_index_offset(f:&mut File) -> Result<u32, u32> {
+    let offset_start = 28;
+    let mut b: [u8; 4] = [0; 4];
+
+    f.seek(SeekFrom::Start(offset_start as u64)).unwrap();
+
+    match f.read(&mut b) {
+        Ok(4) => {
+            let offset:u32 = unsafe { mem::transmute(b) };
+            Ok(offset)
+        },
+        Ok(_) => Err(1),
+        Err(_) => Err(2),
+    }
+}
+
+pub fn read_index(f:&mut File) -> Vec<MsgIndexEntry> {
+    let index_offset = read_index_offset(f).unwrap();
+    f.seek(SeekFrom::Start(index_offset as u64)).unwrap();
+
+    let first_index_entry = read_index_entry(f).unwrap();
+    let size_of_index_entry = mem::size_of::<MsgIndexEntry>();
+
+    let entry_count = (first_index_entry.offset - index_offset) / (size_of_index_entry as u32);
+
+    let mut index = Vec::with_capacity(entry_count as usize);
+    index.push(first_index_entry);
+
+    for _ in 1..entry_count {
+        index.push(read_index_entry(f).unwrap());
+    }
+
+    index
+}
+
+pub fn read_msg(f:&mut File, entry: &MsgIndexEntry) -> Result<String,u32> {
+    let mut b:Vec<u8> = vec![0; entry.size() as usize];
+    
+    f.seek(SeekFrom::Start(entry.offset as u64)).unwrap();
+
+    match f.read(&mut b) {
+        Ok(_) => {
+            let msg = UTF_16LE.decode(&b, DecoderTrap::Replace).unwrap();
+            Ok(msg)
+        },
+        Err(_) => Err(1)
+    }
+}
+
+pub fn decode(source:&String, _destination:&String) {
+    let mut f = File::open(source).unwrap();
+
+    let index:Vec<MsgIndexEntry> = read_index(&mut f);
+
+    for i in index {
+        println!("{}", read_msg(&mut f, &i).unwrap());
+    }
 }
 
 pub fn decompress(source:&String, destination:&String) {
     println!("Decoding: {}", source);
     let mut f = File::open(source).unwrap();
     let header = read_header(&mut f).unwrap();
-    println!("Header: {:?}", header);
     let entries = read_entries(&mut f, &header);
 
     for entry in entries {
-        println!("Entry: {:?}", entry);
         let file_chunk = read_file_chunk(&entry, &mut f);
         let decompressed_chunk = decompress_file_chunk(&entry, &file_chunk);
         write_entry(&entry, &decompressed_chunk, destination).ok();

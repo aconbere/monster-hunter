@@ -3,6 +3,7 @@ extern crate rawsql;
 extern crate docopt;
 extern crate rustc_serialize;
 extern crate flate2;
+extern crate encoding;
 
 use docopt::Docopt;
 
@@ -46,8 +47,7 @@ fn main() {
 
     if args.cmd_archive {
 	    if args.cmd_decode {
-            let entries = archive::decode(&args.arg_source, &args.arg_destination);
-            println!("entries: {:?}", entries);
+            archive::decode(&args.arg_source, &args.arg_destination);
         } else if args.cmd_decompress {
             archive::decompress(&args.arg_source, &args.arg_destination);
         }
