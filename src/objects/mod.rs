@@ -9,3 +9,4 @@ pub mod palico_equipment;
 pub mod equipment;
 pub mod expedition;
 pub mod palico;
+pub mod archive;

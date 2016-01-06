@@ -1,5 +1,3 @@
-use std::fmt;
-use std::str;
 use std::mem;
 use std::fs::File;
 use std::io::Write;
@@ -12,68 +10,16 @@ use flate2::{Decompress, Flush, Status, DataError};
 use encoding::{Encoding, DecoderTrap};
 use encoding::all::{UTF_16LE};
 
+use objects::archive::{ArchiveHeader, ArchiveEntry, MsgIndexEntry};
+
 // const DECOMPRESSED_FILE_SIZE_MASK: u32 = 0b1111_0000_0000_0000_0000_0000_0000_0000;
 
-#[derive(Debug)]
-#[repr(C, packed)]
-pub struct Header {
-    magic: u32,
-    format_version: u16,
-    file_count: u16,
-    unknown_1: u32,
-}
-
-#[repr(C, packed)]
-pub struct Entry {
-    file_name: [u8; 64],
-    file_type: u32,
-    compressed_file_size: u32,
-    decompressed_file_size: u32,
-    file_offset: u32,
-}
-
-impl fmt::Debug for Entry {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,  r#"Entry: (
-        file_name: {},
-        file_type: {},
-        file_offset: {},
-        compressed_file_size: {},
-        decompressed_file_size: {}
-        )"#,
-        self.file_name(),
-        self.file_type,
-        self.file_offset,
-        self.compressed_file_size,
-        self.decompressed_file_size())
-    }
-}
-
-impl Entry {
-    fn file_name(&self) -> String {
-        // trim matches to remove extra nulls from the buffer
-        String::from(str::from_utf8(&self.file_name).unwrap().trim_matches('\0'))
-    }
-
-    fn file_name_unix(&self) -> String {
-        //self.file_name()
-        self.file_name().replace("\\", ".")
-    }
-
-    fn decompressed_file_size(&self) -> u32 {
-        // The last 4 bytes of this are for unknown purposes
-        // I'm not entirely sure how to mask of 4 bits in rush
-        // so instead I'm just shifting forward 4 then backwards
-        (self.decompressed_file_size << 4) >> 4
-    }
-}
-
-fn read_header(f: &mut File) -> Result<Header, i32> {
+fn read_header(f: &mut File) -> Result<ArchiveHeader, i32> {
     let mut buf: [u8; 12] = [0; 12];
 
     match f.read(&mut buf) {
         Ok(12) => {
-            let h:Header = unsafe { mem::transmute(buf) };
+            let h:ArchiveHeader = unsafe { mem::transmute(buf) };
             Ok(h)
         },
         Ok(_) => Err(1),
@@ -81,12 +27,12 @@ fn read_header(f: &mut File) -> Result<Header, i32> {
     }
 }
 
-fn read_entry(f: &mut File) -> Result<Entry, i32> {
+fn read_entry(f: &mut File) -> Result<ArchiveEntry, i32> {
     let mut buf: [u8; 80] = [0; 80];
 
     match f.read(&mut buf) {
         Ok(80) => {
-            let e:Entry = unsafe { mem::transmute(buf) };
+            let e:ArchiveEntry = unsafe { mem::transmute(buf) };
             Ok(e)
         },
         Ok(_) => Err(1),
@@ -94,8 +40,8 @@ fn read_entry(f: &mut File) -> Result<Entry, i32> {
     }
 }
 
-fn read_entries(f: &mut File, header: &Header) -> Vec<Entry> {
-    let mut entries = Vec::<Entry>::with_capacity(header.file_count as usize);
+fn read_entries(f: &mut File, header: &ArchiveHeader) -> Vec<ArchiveEntry> {
+    let mut entries = Vec::<ArchiveEntry>::with_capacity(header.file_count as usize);
 
     for _ in 0..header.file_count {
         entries.push(read_entry(f).unwrap())
@@ -104,14 +50,14 @@ fn read_entries(f: &mut File, header: &Header) -> Vec<Entry> {
     entries
 }
 
-fn read_file_chunk(entry: &Entry, f: &mut File) -> Vec<u8> {
+fn read_file_chunk(entry: &ArchiveEntry, f: &mut File) -> Vec<u8> {
     let mut b:Vec<u8> = vec![0; entry.compressed_file_size as usize];
     f.seek(SeekFrom::Start(entry.file_offset as u64)).unwrap();
     f.read(&mut b).unwrap();
     b
 }
 
-fn decompress_file_chunk(entry: &Entry, bytes:&Vec<u8>) -> Vec<u8> {
+fn decompress_file_chunk(entry: &ArchiveEntry, bytes:&Vec<u8>) -> Vec<u8> {
     let mut b:Vec<u8> = Vec::with_capacity(entry.decompressed_file_size() as usize);
     let mut d = Decompress::new(true);
     match d.decompress_vec(bytes, &mut b, Flush::Finish) {
@@ -123,7 +69,7 @@ fn decompress_file_chunk(entry: &Entry, bytes:&Vec<u8>) -> Vec<u8> {
     b
 }
 
-fn write_entry(entry: &Entry, chunk: &Vec<u8>, destination: &String) -> io::Result<()> {
+fn write_entry(entry: &ArchiveEntry, chunk: &Vec<u8>, destination: &String) -> io::Result<()> {
     let out_file = format!("{}/{}", destination, entry.file_name_unix());
 
     match File::create(out_file) {
@@ -137,19 +83,6 @@ fn write_entry(entry: &Entry, chunk: &Vec<u8>, destination: &String) -> io::Resu
     Ok(())
 }
 
-#[derive(Debug)]
-#[repr(C, packed)]
-pub struct MsgIndexEntry {
-    pub offset:u32,
-    pub size:u32,
-    unknown_1:u32,
-}
-
-impl MsgIndexEntry {
-    fn size(&self) -> u32 {
-        self.size * 2
-    }
-}
 
 pub fn read_index_entry(f:&mut File) -> Result<MsgIndexEntry, u32> {
     let mut b: [u8; 12] = [0; 12];
