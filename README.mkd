@@ -2,6 +2,17 @@
 
 In progress work to decode monster hunter binary files and output them as a sqlite database;
 
+## Decrypting your save file
+
+```
+git clone https://github.com/svanheulen/mhef
+cd mhef
+mkdir
+virtualenv venv
+./venv/bin/python setup.py install
+./venv/bin/python examples/n3ds/savedata.py --mode=d -i path/to/save/file -o ~/user.decrypted
+```
+
 ## Building
 
 ```bash
