@@ -44,3 +44,9 @@ monster-hunter archive decode <archive/path>
 ```
 
 This will decode an MH4U embedded `msg` archive file and output it's contents to STDOUT
+
+## TODO
+
+Learn how to extract romfs:
+
+* http://gbatemp.net/threads/download-decrypt9-open-source-decryption-tools-wip.388831/
