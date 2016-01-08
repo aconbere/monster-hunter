@@ -18,7 +18,7 @@ pub fn decode(source: &String, dest:&String) {
             let result: Character = unsafe {
                 mem::transmute(buffer)
             };
-            sqlite::export(&result, &destination);
+            sqlite::export_save(&result, &destination);
         }
         _ => panic!("read failed")
     }

@@ -72,8 +72,11 @@ fn insert_character(conn: &Connection, character:&Character) {
     }
 }
 
-pub fn export(character: &Character, destination: &Path) {
+pub fn export_save(character: &Character, destination: &Path) {
     let conn = Connection::open(destination).unwrap();
     create_tables(&conn, TABLES);
     insert_character(&conn, character)
+}
+
+pub fn export_archive() {
 }

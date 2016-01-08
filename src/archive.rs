@@ -148,35 +148,35 @@ pub fn read_msg(f:&mut File, entry: &MsgIndexEntry) -> Result<String,u32> {
     }
 }
 
-pub fn decode(source:&String) {
-    let mut f = File::open(source).unwrap();
-
-    let index:Vec<MsgIndexEntry> = read_index(&mut f);
-
-    for i in index {
-        println!("{}", read_msg(&mut f, &i).unwrap());
-    }
+pub struct MessageCollection {
+    pub messages: Vec<String>,
+    pub source: String,
 }
 
+pub fn decode_text_file(source:&String, source_name:&String) -> MessageCollection {
+    let mut f = File::open(source).unwrap();
+    let messages = read_index(&mut f);
+    MessageCollection { source: source,
+                        source_name: source_name,
+                        messages: messages }
+}
 
-pub fn decode_all(source:&String) {
+pub fn decode_text_files(source:&String) {
     let re = Regex::new(r"eng\.msg\.(.*)_eng").unwrap();
 
-    for entry in fs::read_dir(source).unwrap() {
+    fs::read_dir(source).unwrap().filter_map(|entry| {
         let entry = entry.unwrap();
         let file_name = entry.file_name();
         let path = entry.path();
         let path_str = path.to_str().unwrap();
         let path_string = path_str.to_string();
         let name = file_name.to_str().unwrap();
-        match re.captures(name) {
-            Some(cap) => {
-                println!("{}", cap.at(1).unwrap().replace(".", "_"));
-                decode(&path_string);
-            },
-            None => (),
-        }
-    }
+        re.captures(name).map(|cap| {
+            (path_string, cap.at(1).unwrap())
+        })
+    }).map(|(path_string, source_name)| {
+        decode_text_file(path_string, source_name)
+    }).collect::<Vec<MessageCollection>>()
 }
 
 pub fn decompress(source:&String, destination:&String) {

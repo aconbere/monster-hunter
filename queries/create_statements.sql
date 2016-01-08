@@ -66,3 +66,17 @@ CREATE TABLE weapons (
   rarity         INTEGER NOT NULL,
   hone_type      INTEGER NOT NULL
 );
+
+-- name: create_message_names_table
+CREATE TABLE message_names (
+  source TEXT NOT NULL,
+  type TEXT NOT NULL,
+  text TEXT NOT NULL
+);
+
+-- name: create_message_names_table
+CREATE TABLE message_descriptions (
+  source TEXT NOT NULL,
+  type TEXT NOT NULL,
+  text TEXT NOT NULL
+);

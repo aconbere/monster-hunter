@@ -50,11 +50,11 @@ fn main() {
 
     if args.cmd_archive {
 	    if args.cmd_decode {
-            archive::decode(&args.arg_source);
+            archive::decode_text_files(&args.arg_source);
         } else if args.cmd_decompress {
             archive::decompress(&args.arg_source, &args.arg_destination);
         } else if args.cmd_decode_all {
-            archive::decode_all(&args.arg_source);
+            archive::decode_text_files(&args.arg_source);
         }
     }
 }
