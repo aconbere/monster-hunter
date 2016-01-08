@@ -71,7 +71,7 @@ fn decompress_file_chunk(entry: &ArchiveEntry, bytes:&Vec<u8>) -> Vec<u8> {
     b
 }
 
-fn write_entry(entry: &ArchiveEntry, chunk: &Vec<u8>, destination: &String) -> io::Result<()> {
+fn write_entry(entry: &ArchiveEntry, chunk: &Vec<u8>, destination: &str) -> io::Result<()> {
     let out_file = format!("{}/{}", destination, entry.file_name_unix());
 
     match File::create(out_file) {
@@ -154,9 +154,9 @@ pub struct MessageCollection {
     pub source_name: String,
 }
 
-pub fn decode_text_file(source:&String, source_name:&String) -> MessageCollection {
+pub fn decode_text_file(source:&str, source_name:&str) -> MessageCollection {
     let mut f = File::open(source).unwrap();
-    let messages:Vec<String> = Vec::new();
+    let mut messages:Vec<String> = Vec::new();
 
     for entry in read_index(&mut f) {
         match read_msg(&mut f, &entry) {
@@ -165,12 +165,12 @@ pub fn decode_text_file(source:&String, source_name:&String) -> MessageCollectio
         }
     }
 
-    MessageCollection { source: source,
-                        source_name: source_name,
+    MessageCollection { source: source.to_string(),
+                        source_name: source_name.to_string(),
                         messages: messages }
 }
 
-pub fn decode_text_files(source:&String) -> Vec<MessageCollection> {
+pub fn decode_text_files(source:&str) -> Vec<MessageCollection> {
     let re = Regex::new(r"eng\.msg\.(.*)_eng").unwrap();
 
     fs::read_dir(source).unwrap().filter_map(|entry| {
@@ -178,7 +178,7 @@ pub fn decode_text_files(source:&String) -> Vec<MessageCollection> {
         let file_name = entry.file_name();
         let path = entry.path();
         let path_str = path.to_str().unwrap();
-        let path_string = path_str.to_string();
+        let path_string = path_str;
         let name = file_name.to_str().unwrap();
         re.captures(name).map(|cap| {
             (path_string, cap.at(1).unwrap())
@@ -188,7 +188,7 @@ pub fn decode_text_files(source:&String) -> Vec<MessageCollection> {
     }).collect::<Vec<MessageCollection>>()
 }
 
-pub fn decompress(source:&String, destination:&String) {
+pub fn decompress(source:&str, destination:&str) {
     println!("Decoding: {}", source);
     let mut f = File::open(source).unwrap();
     let header = read_header(&mut f).unwrap();
