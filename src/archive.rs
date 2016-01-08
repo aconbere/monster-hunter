@@ -176,10 +176,10 @@ pub fn decode_text_files(source:&str) -> Vec<MessageCollection> {
     fs::read_dir(source).unwrap().filter_map(|entry| {
         let entry = entry.unwrap();
         let file_name = entry.file_name();
-        let path = entry.path();
-        let path_str = path.to_str().unwrap();
-        let path_string = path_str;
         let name = file_name.to_str().unwrap();
+
+        let path = entry.path();
+        let path_string = path.to_str().unwrap();
         re.captures(name).map(|cap| {
             (path_string, cap.at(1).unwrap())
         })
