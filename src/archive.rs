@@ -151,17 +151,26 @@ pub fn read_msg(f:&mut File, entry: &MsgIndexEntry) -> Result<String,u32> {
 pub struct MessageCollection {
     pub messages: Vec<String>,
     pub source: String,
+    pub source_name: String,
 }
 
 pub fn decode_text_file(source:&String, source_name:&String) -> MessageCollection {
     let mut f = File::open(source).unwrap();
-    let messages = read_index(&mut f);
+    let messages:Vec<String> = Vec::new();
+
+    for entry in read_index(&mut f) {
+        match read_msg(&mut f, &entry) {
+            Ok(msg) => messages.push(msg),
+            _ => (),
+        }
+    }
+
     MessageCollection { source: source,
                         source_name: source_name,
                         messages: messages }
 }
 
-pub fn decode_text_files(source:&String) {
+pub fn decode_text_files(source:&String) -> Vec<MessageCollection> {
     let re = Regex::new(r"eng\.msg\.(.*)_eng").unwrap();
 
     fs::read_dir(source).unwrap().filter_map(|entry| {
