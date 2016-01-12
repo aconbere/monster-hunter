@@ -16,7 +16,6 @@ mod archive;
 const USAGE: &'static str = "
 Usage: mh save decode <source> <destination>
        mh archive decode <source>
-       mh archive decode-all <source>
        mh archive decompress <source> <destination>
 	   mh -h | --help
 	   mh --version
@@ -44,17 +43,17 @@ fn main() {
 	
 	if args.cmd_save {
 	    if args.cmd_decode {
-            save::decode(&args.arg_source, &args.arg_destination);
+            let character = save::decode(&args.arg_source);
+            targets::sqlite::export_save(&args.arg_destination, &character);
         }
     }
 
     if args.cmd_archive {
-	    if args.cmd_decode {
-            archive::decode_text_files(&args.arg_source);
-        } else if args.cmd_decompress {
+        if args.cmd_decompress {
             archive::decompress(&args.arg_source, &args.arg_destination);
-        } else if args.cmd_decode_all {
-            archive::decode_text_files(&args.arg_source);
+        } else if args.cmd_decode {
+            let archives = archive::decode_text_files(&args.arg_source);
+            targets::sqlite::export_archive(&args.arg_destination, archives);
         }
     }
 }

@@ -1,9 +1,11 @@
 -- name: create_users_table
+DROP TABLE IF EXISTS users;
 CREATE TABLE users (
   id INTEGER PRIMARY KEY
 );
 
 -- name: create_game_data_table
+DROP TABLE IF EXISTS game_data;
 CREATE TABLE game_data (
   id              INTEGER PRIMARY KEY,
   user_id         INTEGER,
@@ -19,6 +21,7 @@ CREATE TABLE game_data (
 -- skin_tone:      Color,
 
 -- name create_user_features_table
+DROP TABLE IF EXISTS user_features;
 CREATE TABLE user_features (
   id            INTEGER PRIMARY KEY,
   user_id       INTEGER,
@@ -33,6 +36,7 @@ CREATE TABLE user_features (
 );
 
 -- name: create_talismens_table
+DROP TABLE IF EXISTS talismens;
 CREATE TABLE talismens (
   id             INTEGER PRIMARY KEY,
   user_id        INTEGER NOT NULL,
@@ -45,6 +49,7 @@ CREATE TABLE talismens (
 );
 
 -- name: create_armor_table
+DROP TABLE IF EXISTS armor;
 CREATE TABLE armor (
   id                  INTEGER PRIMARY KEY,
   user_id             INTEGER NOT NULL,
@@ -55,6 +60,7 @@ CREATE TABLE armor (
 );
 
 -- name: create_weapons_table
+DROP TABLE IF EXISTS weapons;
 CREATE TABLE weapons (
   id             INTEGER PRIMARY KEY,
   user_id        INTEGER NOT NULL,
@@ -68,14 +74,8 @@ CREATE TABLE weapons (
 );
 
 -- name: create_message_names_table
-CREATE TABLE message_names (
-  source TEXT NOT NULL,
-  type TEXT NOT NULL,
-  text TEXT NOT NULL
-);
-
--- name: create_message_names_table
-CREATE TABLE message_descriptions (
+DROP TABLE IF EXISTS messages;
+CREATE TABLE messages (
   source TEXT NOT NULL,
   type TEXT NOT NULL,
   text TEXT NOT NULL

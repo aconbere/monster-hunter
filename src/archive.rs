@@ -12,7 +12,7 @@ use encoding::{Encoding, DecoderTrap};
 use encoding::all::{UTF_16LE};
 use regex::Regex;
 
-use objects::archive::{ArchiveHeader, ArchiveEntry, MsgIndexEntry};
+use objects::archive::{ArchiveHeader, ArchiveEntry, MsgIndexEntry, MessageCollection};
 
 // const DECOMPRESSED_FILE_SIZE_MASK: u32 = 0b1111_0000_0000_0000_0000_0000_0000_0000;
 
@@ -148,12 +148,6 @@ pub fn read_msg(f:&mut File, entry: &MsgIndexEntry) -> Result<String,u32> {
     }
 }
 
-pub struct MessageCollection {
-    pub messages: Vec<String>,
-    pub source: String,
-    pub source_name: String,
-}
-
 pub fn decode_text_file(source:&str, source_name:&str) -> MessageCollection {
     let mut f = File::open(source).unwrap();
     let mut messages:Vec<String> = Vec::new();
@@ -181,14 +175,14 @@ pub fn decode_text_files(source:&str) -> Vec<MessageCollection> {
 
         re.captures(&file_name).map(|cap| {
             (path_string.to_string(), cap.at(1).unwrap())
+        }).map(|(path_string, source_name)| {
+            decode_text_file(&path_string, source_name)
         })
-    }).map(|(path_string, source_name)| {
-        decode_text_file(&path_string, source_name)
     }).collect::<Vec<MessageCollection>>()
 }
 
 pub fn decompress(source:&str, destination:&str) {
-    println!("Decoding: {}", source);
+    println!("Decompressing: {}", source);
     let mut f = File::open(source).unwrap();
     let header = read_header(&mut f).unwrap();
     let entries = read_entries(&mut f, &header);

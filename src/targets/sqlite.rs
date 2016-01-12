@@ -1,19 +1,21 @@
-use std::path::Path;
-
 use rusqlite::Connection;
 use rawsql::Loader;
 
 use objects::character::Character;
 use objects::equipment::DecodedEquipmentClass;
+use objects::archive::{MessageCollection};
 
-
-static TABLES: &'static [&'static str] = &[
+static CHARACTER_TABLES: &'static [&'static str] = &[
     "users",
     "game_data",
     "user_features",
     "talismens",
     "armor",
     "weapons",
+];
+
+static ARCHIVE_TABLES: &'static [&'static str] = &[
+    "messages",
 ];
 
 fn create_tables(conn: &Connection, tables:&[&str]) {
@@ -72,11 +74,25 @@ fn insert_character(conn: &Connection, character:&Character) {
     }
 }
 
-pub fn export_save(character: &Character, destination: &Path) {
+pub fn export_save(destination: &str, character: &Character) {
     let conn = Connection::open(destination).unwrap();
-    create_tables(&conn, TABLES);
+    create_tables(&conn, CHARACTER_TABLES);
     insert_character(&conn, character)
 }
 
-pub fn export_archive() {
+pub fn export_archive(destination: &str, message_collections:Vec<MessageCollection>) {
+    let conn = Connection::open(destination).unwrap();
+    let queries = Loader::get_queries_from("queries/archive.sql").unwrap().queries;
+    let insert_messages = queries.get("insert_messages").unwrap();
+
+    create_tables(&conn, ARCHIVE_TABLES);
+    for col in message_collections {
+        for m in col.messages {
+            conn.execute(insert_messages, &[
+                &col.source,
+                &col.source_name,
+                &m
+            ]).unwrap();
+        }
+    }
 }

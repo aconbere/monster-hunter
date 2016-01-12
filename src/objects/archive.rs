@@ -1,6 +1,12 @@
 use std::fmt;
 use std::str;
 
+pub struct MessageCollection {
+    pub messages: Vec<String>,
+    pub source: String,
+    pub source_name: String,
+}
+
 #[derive(Debug)]
 #[repr(C, packed)]
 pub struct MsgIndexEntry {
