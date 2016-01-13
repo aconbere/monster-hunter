@@ -209,7 +209,7 @@ pub fn decode_text_file(equipment_type_map:HashMap<&'static str, (EquipmentType,
 
     let (equipment_type, message_type, equipment_id) = match equipment_type_map.get(source_name) {
         Some(t) => t.clone(),
-        None => (EquipmentType::None, MessageType::None, 0),
+        None => (EquipmentType::None, MessageType::None, 0 as u8),
     };
 
     let mut messages:Vec<String> = Vec::new();
