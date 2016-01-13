@@ -48,8 +48,12 @@ fn file_name_to_equipment_type() -> Vec<(&'static str, (EquipmentType, MessageTy
         ("RodExp",      (EquipmentType::InsectGlave,    MessageType::Explanation, 13)),
         ("GaxeName",    (EquipmentType::ChargeBlade,    MessageType::Name,        14)),
         ("GaxeExp",     (EquipmentType::ChargeBlade,    MessageType::Explanation, 14)),
-        ("LanceName",   (EquipmentType::Lance,          MessageType::Name,        15)),
-        ("LanceExp",    (EquipmentType::Lance,          MessageType::Explanation, 15)),
+        ("Lance2Name",  (EquipmentType::GunLance,       MessageType::Name,        15)),
+        ("Lance2Exp",   (EquipmentType::GunLance,       MessageType::Explanation, 15)),
+
+        // these are probably wrong
+        ("LanceName",   (EquipmentType::Lance,          MessageType::Name,        21)),
+        ("LanceExp",    (EquipmentType::Lance,          MessageType::Explanation, 21)),
         ("LightName",   (EquipmentType::LightBowGun,    MessageType::Name,        16)),
         ("LightExp",    (EquipmentType::LightBowGun,    MessageType::Explanation, 16)),
         ("HeavyName",   (EquipmentType::HeavyBowGun,    MessageType::Name,        17)),
@@ -58,8 +62,6 @@ fn file_name_to_equipment_type() -> Vec<(&'static str, (EquipmentType, MessageTy
         ("Lsword2Exp",  (EquipmentType::LongSword,      MessageType::Explanation, 19)),
         ("AxeName",     (EquipmentType::SwitchAxe,      MessageType::Name,        20)),
         ("AxeExp",      (EquipmentType::SwitchAxe,      MessageType::Explanation, 20)),
-        ("Lance2Name",  (EquipmentType::GunLance,       MessageType::Name,        21)),
-        ("Lance2Exp",   (EquipmentType::GunLance,       MessageType::Explanation, 21)),
     ]
 }
 
