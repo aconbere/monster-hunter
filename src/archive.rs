@@ -13,18 +13,12 @@ use encoding::{Encoding, DecoderTrap};
 use encoding::all::{UTF_16LE};
 use regex::Regex;
 
-use objects::archive::{ArchiveHeader, ArchiveEntry, MsgIndexEntry, MessageCollection};
+use objects::archive::{ArchiveHeader, ArchiveEntry, MsgIndexEntry, MessageCollection, MessageType};
 use objects::equipment::{EquipmentType};
 
 // const DECOMPRESSED_FILE_SIZE_MASK: u32 = 0b1111_0000_0000_0000_0000_0000_0000_0000;
 
-enum MessageType {
-    Name,
-    Explanation,
-    Empty,
-}
-
-fn file_name_to_equipment_type() -> Vec<(String, (EquipmentType, MessageType))> {
+fn file_name_to_equipment_type() -> Vec<(String, (EquipmentType, MessageType, u8))> {
     let mappings = vec![
         ("HeadName",    (EquipmentType::Head,           MessageType::Name,        1)),
         ("HeadExp",     (EquipmentType::Head,           MessageType::Explanation, 1)),
@@ -72,12 +66,8 @@ fn file_name_to_equipment_type() -> Vec<(String, (EquipmentType, MessageType))> 
 fn file_name_to_equipment_type_map() -> HashMap<String, (EquipmentType, MessageType, u8)> {
     let mappings = file_name_to_equipment_type();
 
-    let h = HashMap::new();
-
-    for (name, types) in mappings.iter() {
-        h.insert(name, types);
-    }
-
+    let mut h = HashMap::new();
+    h.extend(file_name_to_equipment_type());
     h
 }
 
@@ -214,13 +204,13 @@ pub fn read_msg(f:&mut File, entry: &MsgIndexEntry) -> Result<String,u32> {
 }
 
 
-pub fn decode_text_file(equipment_type_map:HashMap<&str, (EquipmentType, MessageType, u8)>, source:&str, source_name:&str) -> MessageCollection {
+pub fn decode_text_file(equipment_type_map:&HashMap<String, (EquipmentType, MessageType, u8)>, source:&str, source_name:&str) -> MessageCollection {
     println!("decoding: {} into {}", source, source_name.to_string());
     let mut f = File::open(source).unwrap();
 
-    let (equipement_type, message_type, equipment_id) = match equipment_type_map.get(source_name) {
+    let (equipment_type, message_type, equipment_id) = match equipment_type_map.get(source_name) {
         Some((e_type, m_type, e_id)) => (e_type, m_type, e_id),
-        None => (EquipmentType::Empty, MessageType::Empty, 0),
+        None => (EquipmentType::None, MessageType::None, 0),
     };
 
     let mut messages:Vec<String> = Vec::new();
@@ -235,7 +225,7 @@ pub fn decode_text_file(equipment_type_map:HashMap<&str, (EquipmentType, Message
                         source_name: source_name.to_string(),
                         messages: messages,
                         message_type: message_type,
-                        equipement_type: equipement_type,
+                        equipment_type: equipment_type,
                         equipment_id: equipment_id }
 }
 
