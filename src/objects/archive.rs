@@ -19,6 +19,16 @@ pub struct MessageCollection {
     pub message_type: MessageType,
 }
 
+impl MessageCollection {
+    pub fn message_type(&self) -> &str {
+        match self.message_type {
+            MessageType::Name => "name",
+            MessageType::Explanation => "explanation",
+            MessageType::None => "none",
+        }
+    }
+}
+
 #[derive(Debug)]
 #[repr(C, packed)]
 pub struct MsgIndexEntry {

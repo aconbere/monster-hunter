@@ -103,7 +103,8 @@ pub fn export_archive(destination: &str, message_collections:Vec<MessageCollecti
         for (i, m) in col.messages.iter().enumerate() {
             conn.execute(insert_messages, &[
                 &col.source,
-                &col.source_name,
+                &col.message_type(),
+                &(col.equipment_id as i64),
                 &(i as i64),
                 m
             ]).unwrap();

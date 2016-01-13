@@ -90,8 +90,9 @@ DROP TABLE IF EXISTS messages;
 
 -- name: create_messages_table
 CREATE TABLE messages (
-  source TEXT NOT NULL,
-  type   TEXT NOT NULL,
-  idx    INTEGER NOT NULL,
-  text   TEXT NOT NULL
+  source       TEXT NOT NULL,
+  message_type TEXT NOT NULL,
+  equipment_id INTEGER NOT NULL,
+  idx          INTEGER NOT NULL,
+  text         TEXT NOT NULL
 );
