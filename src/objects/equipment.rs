@@ -5,6 +5,7 @@ use objects::weapon::Weapon;
 use objects::armor::Armor;
 use objects::talismen::Talismen;
 
+#[derive(Clone)]
 pub enum EquipmentType {
     Head,
     Chest,

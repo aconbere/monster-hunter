@@ -3,6 +3,7 @@ use std::str;
 
 use objects::equipment::{EquipmentType};
 
+#[derive(Clone)]
 pub enum MessageType {
     Name,
     Explanation,

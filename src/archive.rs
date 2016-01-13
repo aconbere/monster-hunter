@@ -64,8 +64,6 @@ fn file_name_to_equipment_type() -> Vec<(&'static str, (EquipmentType, MessageTy
 }
 
 fn file_name_to_equipment_type_map() -> HashMap<&'static str, (EquipmentType, MessageType, u8)> {
-    let mappings = file_name_to_equipment_type();
-
     let mut h = HashMap::new();
     h.extend(file_name_to_equipment_type());
     h
@@ -203,7 +201,7 @@ pub fn read_msg(f:&mut File, entry: &MsgIndexEntry) -> Result<String,u32> {
     }
 }
 
-pub fn decode_text_file(equipment_type_map:HashMap<&'static str, (EquipmentType, MessageType, u8)>, source:&str, source_name:&str) -> MessageCollection {
+pub fn decode_text_file(equipment_type_map:&HashMap<&'static str, (EquipmentType, MessageType, u8)>, source:&str, source_name:&str) -> MessageCollection {
     println!("decoding: {} into {}", source, source_name.to_string());
     let mut f = File::open(source).unwrap();
 
@@ -241,7 +239,7 @@ pub fn decode_text_files(source:&str) -> Vec<MessageCollection> {
         re.captures(&file_name).map(|cap| {
             (path_string.to_string(), cap.at(1).unwrap())
         }).map(|(path_string, source_name)| {
-            decode_text_file(equipment_type_map, &path_string, source_name)
+            decode_text_file(&equipment_type_map, &path_string, source_name)
         })
     }).collect::<Vec<MessageCollection>>()
 }
