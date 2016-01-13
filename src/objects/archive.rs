@@ -1,10 +1,15 @@
 use std::fmt;
 use std::str;
 
+use objects::equipment::{EquipmentType};
+
 pub struct MessageCollection {
     pub messages: Vec<String>,
     pub source: String,
     pub source_name: String,
+    pub equipment_type: EquipmentType,
+    pub equipment_id: u8,
+    pub message_type: u8,
 }
 
 #[derive(Debug)]

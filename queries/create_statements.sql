@@ -1,11 +1,15 @@
--- name: create_users_table
+-- name: drop_users_table
 DROP TABLE IF EXISTS users;
+
+-- name: create_users_table
 CREATE TABLE users (
   id INTEGER PRIMARY KEY
 );
 
--- name: create_game_data_table
+-- name: drop_game_data_table
 DROP TABLE IF EXISTS game_data;
+
+-- name: create_game_data_table
 CREATE TABLE game_data (
   id              INTEGER PRIMARY KEY,
   user_id         INTEGER,
@@ -20,8 +24,10 @@ CREATE TABLE game_data (
 -- clothing_color: Color,
 -- skin_tone:      Color,
 
--- name create_user_features_table
+-- name drop_user_features_table
 DROP TABLE IF EXISTS user_features;
+
+-- name create_user_features_table
 CREATE TABLE user_features (
   id            INTEGER PRIMARY KEY,
   user_id       INTEGER,
@@ -35,8 +41,10 @@ CREATE TABLE user_features (
   features_type INTEGER NOT NULL
 );
 
--- name: create_talismens_table
+-- name: drop_talismens_table
 DROP TABLE IF EXISTS talismens;
+
+-- name: create_talismens_table
 CREATE TABLE talismens (
   id             INTEGER PRIMARY KEY,
   user_id        INTEGER NOT NULL,
@@ -48,8 +56,10 @@ CREATE TABLE talismens (
   skill_2_amount INTEGER NOT NULL
 );
 
--- name: create_armor_table
+-- name: drop_armor_table
 DROP TABLE IF EXISTS armor;
+
+-- name: create_armor_table
 CREATE TABLE armor (
   id                  INTEGER PRIMARY KEY,
   user_id             INTEGER NOT NULL,
@@ -59,8 +69,10 @@ CREATE TABLE armor (
   rarity              INTEGER NOT NULL
 );
 
--- name: create_weapons_table
+-- name: drop_weapons_table
 DROP TABLE IF EXISTS weapons;
+
+-- name: create_weapons_table
 CREATE TABLE weapons (
   id             INTEGER PRIMARY KEY,
   user_id        INTEGER NOT NULL,
@@ -73,10 +85,13 @@ CREATE TABLE weapons (
   hone_type      INTEGER NOT NULL
 );
 
--- name: create_message_names_table
+-- name: drop_messages_table
 DROP TABLE IF EXISTS messages;
+
+-- name: create_messages_table
 CREATE TABLE messages (
   source TEXT NOT NULL,
-  type TEXT NOT NULL,
-  text TEXT NOT NULL
+  type   TEXT NOT NULL,
+  idx    INTEGER NOT NULL,
+  text   TEXT NOT NULL
 );

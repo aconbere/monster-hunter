@@ -18,6 +18,16 @@ static ARCHIVE_TABLES: &'static [&'static str] = &[
     "messages",
 ];
 
+fn drop_tables(conn: &Connection, tables:&[&str]) {
+    let queries = Loader::get_queries_from("queries/create_statements.sql").unwrap().queries;
+
+    for table in tables.iter() {
+        let statement_name = format!("drop_{}_table", table);
+        let create = queries.get(&statement_name).unwrap();
+        conn.execute(&create, &[]).unwrap();
+    }
+}
+
 fn create_tables(conn: &Connection, tables:&[&str]) {
     let queries = Loader::get_queries_from("queries/create_statements.sql").unwrap().queries;
 
@@ -76,6 +86,7 @@ fn insert_character(conn: &Connection, character:&Character) {
 
 pub fn export_save(destination: &str, character: &Character) {
     let conn = Connection::open(destination).unwrap();
+    drop_tables(&conn, CHARACTER_TABLES);
     create_tables(&conn, CHARACTER_TABLES);
     insert_character(&conn, character)
 }
@@ -85,13 +96,16 @@ pub fn export_archive(destination: &str, message_collections:Vec<MessageCollecti
     let queries = Loader::get_queries_from("queries/archive.sql").unwrap().queries;
     let insert_messages = queries.get("insert_messages").unwrap();
 
+    drop_tables(&conn, ARCHIVE_TABLES);
     create_tables(&conn, ARCHIVE_TABLES);
+
     for col in message_collections {
-        for m in col.messages {
+        for (i, m) in col.messages.iter().enumerate() {
             conn.execute(insert_messages, &[
                 &col.source,
                 &col.source_name,
-                &m
+                &(i as i64),
+                m
             ]).unwrap();
         }
     }

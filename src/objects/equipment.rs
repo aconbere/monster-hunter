@@ -5,6 +5,30 @@ use objects::weapon::Weapon;
 use objects::armor::Armor;
 use objects::talismen::Talismen;
 
+pub enum EquipmentType {
+    Head,
+    Chest,
+    Arms,
+    Waist,
+    Legs,
+    Talismen,
+    GreatSword,
+    SwordAndShield,
+    Hammer,
+    Bow,
+    DualBlades,
+    HuntingHorn,
+    InsectGlave,
+    ChargeBlade,
+    Lance,
+    LightBowGun,
+    HeavyBowGun,
+    LongSword,
+    SwitchAxe,
+    GunLance,
+    None,
+}
+
 enum EquipmentClass {
     Weapon,
     Armor,

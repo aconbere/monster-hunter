@@ -15,7 +15,7 @@ mod archive;
 
 const USAGE: &'static str = "
 Usage: mh save decode <source> <destination>
-       mh archive decode <source>
+       mh archive decode <source> <destination>
        mh archive decompress <source> <destination>
 	   mh -h | --help
 	   mh --version
@@ -33,7 +33,6 @@ struct Args {
     cmd_archive:     bool,
     cmd_decode:      bool,
     cmd_decompress:  bool,
-    cmd_decode_all:  bool,
 }
 
 fn main() {
