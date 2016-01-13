@@ -18,8 +18,8 @@ use objects::equipment::{EquipmentType};
 
 // const DECOMPRESSED_FILE_SIZE_MASK: u32 = 0b1111_0000_0000_0000_0000_0000_0000_0000;
 
-fn file_name_to_equipment_type() -> Vec<(String, (EquipmentType, MessageType, u8))> {
-    let mappings = vec![
+fn file_name_to_equipment_type() -> Vec<(&'static str, (EquipmentType, MessageType, u8))> {
+    vec![
         ("HeadName",    (EquipmentType::Head,           MessageType::Name,        1)),
         ("HeadExp",     (EquipmentType::Head,           MessageType::Explanation, 1)),
         ("BodyName",    (EquipmentType::Chest,          MessageType::Name,        2)),
@@ -60,10 +60,10 @@ fn file_name_to_equipment_type() -> Vec<(String, (EquipmentType, MessageType, u8
         ("AxeExp",      (EquipmentType::SwitchAxe,      MessageType::Explanation, 20)),
         ("Lance2Name",  (EquipmentType::GunLance,       MessageType::Name,        21)),
         ("Lance2Exp",   (EquipmentType::GunLance,       MessageType::Explanation, 21)),
-    ];
+    ]
 }
 
-fn file_name_to_equipment_type_map() -> HashMap<String, (EquipmentType, MessageType, u8)> {
+fn file_name_to_equipment_type_map() -> HashMap<&'static str, (EquipmentType, MessageType, u8)> {
     let mappings = file_name_to_equipment_type();
 
     let mut h = HashMap::new();
@@ -203,13 +203,12 @@ pub fn read_msg(f:&mut File, entry: &MsgIndexEntry) -> Result<String,u32> {
     }
 }
 
-
-pub fn decode_text_file(equipment_type_map:&HashMap<String, (EquipmentType, MessageType, u8)>, source:&str, source_name:&str) -> MessageCollection {
+pub fn decode_text_file(equipment_type_map:HashMap<&'static str, (EquipmentType, MessageType, u8)>, source:&str, source_name:&str) -> MessageCollection {
     println!("decoding: {} into {}", source, source_name.to_string());
     let mut f = File::open(source).unwrap();
 
     let (equipment_type, message_type, equipment_id) = match equipment_type_map.get(source_name) {
-        Some((e_type, m_type, e_id)) => (e_type, m_type, e_id),
+        Some(t) => t.clone(),
         None => (EquipmentType::None, MessageType::None, 0),
     };
 
@@ -242,7 +241,7 @@ pub fn decode_text_files(source:&str) -> Vec<MessageCollection> {
         re.captures(&file_name).map(|cap| {
             (path_string.to_string(), cap.at(1).unwrap())
         }).map(|(path_string, source_name)| {
-            decode_text_file(&equipment_type_map, &path_string, source_name)
+            decode_text_file(equipment_type_map, &path_string, source_name)
         })
     }).collect::<Vec<MessageCollection>>()
 }
