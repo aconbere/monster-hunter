@@ -6,11 +6,11 @@ CREATE TABLE users (
   id INTEGER PRIMARY KEY
 );
 
--- name: drop_game_data_table
-DROP TABLE IF EXISTS game_data;
+-- name: drop_user_game_data_table
+DROP TABLE IF EXISTS user_game_data;
 
--- name: create_game_data_table
-CREATE TABLE game_data (
+-- name: create_user_game_data_table
+CREATE TABLE user_game_data (
   id              INTEGER PRIMARY KEY,
   user_id         INTEGER,
   total_hr_points INTEGER NOT NULL,
@@ -41,11 +41,11 @@ CREATE TABLE user_features (
   features_type INTEGER NOT NULL
 );
 
--- name: drop_talismens_table
-DROP TABLE IF EXISTS talismens;
+-- name: drop_user_talismens_table
+DROP TABLE IF EXISTS user_talismens;
 
--- name: create_talismens_table
-CREATE TABLE talismens (
+-- name: create_user_talismens_table
+CREATE TABLE user_talismens (
   id             INTEGER PRIMARY KEY,
   user_id        INTEGER NOT NULL,
   slots          INTEGER NOT NULL,
@@ -56,11 +56,11 @@ CREATE TABLE talismens (
   skill_2_amount INTEGER NOT NULL
 );
 
--- name: drop_armor_table
-DROP TABLE IF EXISTS armor;
+-- name: drop_user_armor_table
+DROP TABLE IF EXISTS user_armor;
 
--- name: create_armor_table
-CREATE TABLE armor (
+-- name: create_user_armor_table
+CREATE TABLE user_armor (
   id                  INTEGER PRIMARY KEY,
   user_id             INTEGER NOT NULL,
   equipment_type      INTEGER NOT NULL,
@@ -69,11 +69,11 @@ CREATE TABLE armor (
   rarity              INTEGER NOT NULL
 );
 
--- name: drop_weapons_table
-DROP TABLE IF EXISTS weapons;
+-- name: drop_user_weapons_table
+DROP TABLE IF EXISTS user_weapons;
 
--- name: create_weapons_table
-CREATE TABLE weapons (
+-- name: create_user_weapons_table
+CREATE TABLE user_weapons (
   id             INTEGER PRIMARY KEY,
   user_id        INTEGER NOT NULL,
   equipment_type INTEGER NOT NULL,
@@ -85,12 +85,24 @@ CREATE TABLE weapons (
   hone_type      INTEGER NOT NULL
 );
 
--- name: drop_messages_table
-DROP TABLE IF EXISTS messages;
+-- name: drop_user_items_table
+DROP TABLE IF EXISTS user_items;
 
--- name: create_messages_table
-CREATE TABLE messages (
+-- name: create_user_items_table
+CREATE TABLE user_items (
+  user_id INTEGER NOT NULL,
+  idx     INTEGER NOT NULL,
+  item_id INTEGER NOT NULL,
+  count   INTEGER NOT NULL
+);
+
+-- name: drop_archive_messages_table
+DROP TABLE IF EXISTS archive_messages;
+
+-- name: create_archive_messages_table
+CREATE TABLE archive_messages (
   source       TEXT NOT NULL,
+  source_name  TEXT NOT NULL,
   message_type TEXT NOT NULL,
   equipment_id INTEGER NOT NULL,
   idx          INTEGER NOT NULL,

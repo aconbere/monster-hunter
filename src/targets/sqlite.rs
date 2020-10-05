@@ -7,15 +7,16 @@ use objects::archive::{MessageCollection};
 
 static CHARACTER_TABLES: &'static [&'static str] = &[
     "users",
-    "game_data",
+    "user_game_data",
     "user_features",
-    "talismens",
-    "armor",
-    "weapons",
+    "user_talismens",
+    "user_armor",
+    "user_weapons",
+    "user_items",
 ];
 
 static ARCHIVE_TABLES: &'static [&'static str] = &[
-    "messages",
+    "archive_messages",
 ];
 
 fn drop_tables(conn: &Connection, tables:&[&str]) {
@@ -40,14 +41,24 @@ fn create_tables(conn: &Connection, tables:&[&str]) {
 
 fn insert_character(conn: &Connection, character:&Character) {
     let queries = Loader::get_queries_from("queries/character.sql").unwrap().queries;
-    let insert_talismen = queries.get("insert_talismen").unwrap();
-    let insert_armor = queries.get("insert_armor").unwrap();
-    let insert_weapon = queries.get("insert_weapon").unwrap();
+    let insert_user_talismen = queries.get("insert_user_talismen").unwrap();
+    let insert_user_armor = queries.get("insert_user_armor").unwrap();
+    let insert_user_weapon = queries.get("insert_user_weapon").unwrap();
+    let insert_user_item = queries.get("insert_user_item").unwrap();
+
+    for (idx, item) in character.item_box.iter().enumerate() {
+        conn.execute(insert_user_item, &[
+            &1,
+            &(idx as i64),
+            &(item.item_id as i64),
+            &(item.count as i64)
+        ]).unwrap();
+    }
 
     for equipment in character.equipment_box.iter() {
         match equipment.decode() {
             DecodedEquipmentClass::Talismen(talismen) => {
-                conn.execute(insert_talismen, &[
+                conn.execute(insert_user_talismen, &[
                     &1,
                     &(talismen.number_of_slots as i64),
                     &(talismen.talismen_id as i64),
@@ -58,7 +69,7 @@ fn insert_character(conn: &Connection, character:&Character) {
                 ]).unwrap();
             },
             DecodedEquipmentClass::Armor(armor) => {
-                conn.execute(insert_armor, &[
+                conn.execute(insert_user_armor, &[
                     &1,
                     &(armor.equipment_type as i64),
                     &(armor.armor_id as i64),
@@ -67,7 +78,7 @@ fn insert_character(conn: &Connection, character:&Character) {
                 ]).unwrap();
             },
             DecodedEquipmentClass::Weapon(weapon) => {
-                conn.execute(insert_weapon, &[
+                conn.execute(insert_user_weapon, &[
                     &1,
                     &(weapon.weapon_id as i64),
                     &(weapon.equipment_type as i64),
@@ -94,15 +105,16 @@ pub fn export_save(destination: &str, character: &Character) {
 pub fn export_archive(destination: &str, message_collections:Vec<MessageCollection>) {
     let conn = Connection::open(destination).unwrap();
     let queries = Loader::get_queries_from("queries/archive.sql").unwrap().queries;
-    let insert_messages = queries.get("insert_messages").unwrap();
+    let insert_archive_messages = queries.get("insert_archive_messages").unwrap();
 
     drop_tables(&conn, ARCHIVE_TABLES);
     create_tables(&conn, ARCHIVE_TABLES);
 
     for col in message_collections {
         for (i, m) in col.messages.iter().enumerate() {
-            conn.execute(insert_messages, &[
+            conn.execute(insert_archive_messages, &[
                 &col.source,
+                &col.source_name,
                 &col.message_type(),
                 &(col.equipment_id as i64),
                 &(i as i64),

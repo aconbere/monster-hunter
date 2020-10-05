@@ -229,6 +229,7 @@ pub fn decode_text_file(equipment_type_map:&HashMap<&'static str, (EquipmentType
 }
 
 pub fn decode_text_files(source:&str) -> Vec<MessageCollection> {
+    println!("decoding: {}", source);
     let re = Regex::new(r"eng\.msg\.(.*)_eng").unwrap();
     let equipment_type_map = file_name_to_equipment_type_map();
 

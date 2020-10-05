@@ -7,7 +7,6 @@ In progress work to decode monster hunter binary files and output them as a sqli
 ```
 git clone https://github.com/svanheulen/mhef
 cd mhef
-mkdir
 virtualenv venv
 ./venv/bin/python setup.py install
 ./venv/bin/python examples/n3ds/savedata.py --mode=d -i path/to/save/file -o ~/user.decrypted
@@ -77,10 +76,14 @@ Brain Dump
 https://github.com/3dshax/ctr/tree/master/ctrtool
 
 ```bash
-ctrtool --exefsdir=exefs --decompresscode <titleid>.cxi \
+ctrtool --exefsdir=exefs <titleid>.cxi \
 ctrtool --romfs=romfs.bin --decompresscode <titleid>.cxi \
 ctrtool --romfsdir=romfs --intype=romfs romfs.bin
 ```
+
+#### Dissassembling code.bin
+
+Read code.bin in as 32 bit arm v6 with an offset of 0x100000
 
 #### File information
 
@@ -100,3 +103,5 @@ monyan == meownster hunters
 otomo == palicos
 
 `m\da\d` (ex: m19a01)  == map area data
+
+

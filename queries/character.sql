@@ -1,5 +1,5 @@
---name: insert_talismen
-INSERT INTO talismens (
+--name: insert_user_talismen
+INSERT INTO user_talismens (
   user_id,
   slots,
   talismen_id,
@@ -11,8 +11,8 @@ INSERT INTO talismens (
   $1, $2, $3, $4, $5, $6, $7
 );
 
---name: insert_armor
-INSERT INTO armor (
+--name: insert_user_armor
+INSERT INTO user_armor (
   user_id,
   equipment_type,
   armor_id,
@@ -22,8 +22,8 @@ INSERT INTO armor (
   $1, $2, $3, $4, $5
 );
 
---name: insert_weapon
-INSERT INTO weapons (
+--name: insert_user_weapon
+INSERT INTO user_weapons (
   user_id,
   weapon_id,
   equipment_type,
@@ -34,4 +34,14 @@ INSERT INTO weapons (
   hone_type
 ) VALUES (
   $1, $2, $3, $4, $5, $6, $7, $8
+);
+
+--name: insert_user_item
+INSERT INTO user_items (
+  user_id,
+  idx,
+  item_id,
+  count
+) VALUES (
+  $1, $2, $3, $4
 );
